@@ -17,7 +17,7 @@ setup(
     # metadata for upload to PyPI
     author="Evgeny Boger",
     author_email="boger@contactless.ru",
-    url="https://github.com/contactless/mqtt-rpc/tree/master/python",
+    url="https://github.com/wirenboard/python-mqtt-rpc",
     description="WB MQTT-RPC reference implementation",
     long_description=read('README.md'),
 
