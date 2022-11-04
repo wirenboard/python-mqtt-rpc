@@ -1,0 +1,6 @@
+### Python ###
+*.egg-info/
+
+### direnv ###
+.direnv
+.envrc
