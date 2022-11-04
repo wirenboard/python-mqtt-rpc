@@ -1,36 +1,66 @@
+#!/usr/bin/env python3
+
+import os
 import json, time
 import pprint
 import argparse
-
 
 try:
     import mosquitto
 except ImportError:
     import paho.mqtt.client as mosquitto
 
-
 from mqttrpc.client import TMQTTRPCClient
 from jsonrpc.exceptions import JSONRPCError
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Sample RPC client', add_help=False)
-
-    parser.add_argument('-h', '--host', dest='host', type=str,
-                     help='MQTT host', default='localhost')
-
-    parser.add_argument('-u', '--username', dest='username', type=str,
-                     help='MQTT username', default='')
-
-    parser.add_argument('-P', '--password', dest='password', type=str,
-                     help='MQTT password', default='')
-
-    parser.add_argument('-p', '--port', dest='port', type=int,
-                     help='MQTT port', default='1883')
-
+    parser = argparse.ArgumentParser(description="Sample RPC client", add_help=False)
+    parser.add_argument(
+        "-h", "--host", dest="host", type=str, help="MQTT host", default="localhost"
+    )
+    parser.add_argument(
+        "-p", "--port", dest="port", type=int, help="MQTT port", default="1883"
+    )
+    parser.add_argument(
+        "-u", "--username", dest="username", type=str, help="MQTT username", default=""
+    )
+    parser.add_argument(
+        "-P", "--password", dest="password", type=str, help="MQTT password", default=""
+    )
+    parser.add_argument(
+        "-d",
+        "--driver",
+        dest="driver",
+        type=str,
+        help="Driver name",
+        default="db_logger",
+    )
+    parser.add_argument(
+        "-s",
+        "--service",
+        dest="service",
+        type=str,
+        help="Service name",
+        default="history",
+    )
+    parser.add_argument(
+        "-m",
+        "--method",
+        dest="method",
+        type=str,
+        help="Method name",
+        default="get_channels",
+    )
+    parser.add_argument(
+        "-a", "--args", dest="args", type=str, help="Method arguments", default="{}"
+    )
+    parser.add_argument(
+        "-t", "--timeout", dest="timeout", type=int, help="Timeout", default=10
+    )
     args = parser.parse_args()
-    client = mosquitto.Mosquitto()
 
+    client = mosquitto.Client("mqtt-rpc-client-%d" % os.getpid())
     if args.username:
         client.username_pw_set(args.username, args.password)
 
@@ -40,28 +70,10 @@ def main():
     rpc_client = TMQTTRPCClient(client)
     client.on_message = rpc_client.on_mqtt_message
 
-    #~ resp =  rpc_client.call('Driver', 'main', 'foobar', {'foo':'foo', 'bar':'bar'})
-
-    for i in xrange(10):
-        resp =  rpc_client.call('db_logger', 'history', 'get_values', {
-                    'channels': [
-                        [ 'wb-w1', '00-1234566789' ],
-                        [ 'wb-w1', '00' ],
-                        [ 'wb-adc', 'Vin'],
-                    ],
-
-                    'timestamp' : {
-                        'gt': 1434728034
-                    },
-                    'limit' : 60
-                }, 10)
-
-        print "got result!"
-        pprint.pprint(resp)
-        time.sleep(5)
-
-
-
+    resp = rpc_client.call(
+        args.driver, args.service, args.method, json.loads(args.args), args.timeout
+    )
+    pprint.pprint(resp)
 
 
 if __name__ == "__main__":
