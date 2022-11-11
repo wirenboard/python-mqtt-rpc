@@ -52,7 +52,7 @@ def main():
         if url.username:
             client.username_pw_set(url.username, url.password)
         client.connect(url.hostname, url.port)
-    else if url.scheme == "unix":
+    elif url.scheme == "unix":
         client.sock_connect(url.path)
     else:
         print("Unkown mqtt url scheme")
