@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 from paho.mqtt import client as mqttclient
 from mqttrpc.client import TMQTTRPCClient
 from jsonrpc.exceptions import JSONRPCError
+import paho_socket
 
 
 def main():
@@ -45,14 +46,15 @@ def main():
     )
     args = parser.parse_args()
 
-    client = mqttclient.Client("mqtt-rpc-client-%d" % os.getpid())
-
     url = urlparse(args.broker_url)
+    client_id = "mqtt-rpc-client-%d" % os.getpid()
     if url.scheme == "mqtt-tcp":
+        client = mqttclient.Client(client_id)
         if url.username:
             client.username_pw_set(url.username, url.password)
         client.connect(url.hostname, url.port)
     elif url.scheme == "unix":
+        client = paho_socket.Client(client_id)
         client.sock_connect(url.path)
     else:
         print("Unkown mqtt url scheme")
