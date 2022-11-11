@@ -5,11 +5,7 @@ import json, time
 import pprint
 import argparse
 
-try:
-    import mosquitto
-except ImportError:
-    import paho.mqtt.client as mosquitto
-
+from paho.mqtt import client as mqttclient
 from mqttrpc.client import TMQTTRPCClient
 from jsonrpc.exceptions import JSONRPCError
 
@@ -33,34 +29,31 @@ def main():
         "--driver",
         dest="driver",
         type=str,
-        help="Driver name",
-        default="db_logger",
+        help="Driver name"
     )
     parser.add_argument(
         "-s",
         "--service",
         dest="service",
         type=str,
-        help="Service name",
-        default="history",
+        help="Service name"
     )
     parser.add_argument(
         "-m",
         "--method",
         dest="method",
         type=str,
-        help="Method name",
-        default="get_channels",
+        help="Method name"
     )
     parser.add_argument(
-        "-a", "--args", dest="args", type=str, help="Method arguments", default="{}"
+        "-a", "--args", dest="args", type=json.loads, help="Method arguments"
     )
     parser.add_argument(
         "-t", "--timeout", dest="timeout", type=int, help="Timeout", default=10
     )
     args = parser.parse_args()
 
-    client = mosquitto.Client("mqtt-rpc-client-%d" % os.getpid())
+    client = mqttclient.Client("mqtt-rpc-client-%d" % os.getpid())
     if args.username:
         client.username_pw_set(args.username, args.password)
 
@@ -71,7 +64,7 @@ def main():
     client.on_message = rpc_client.on_mqtt_message
 
     resp = rpc_client.call(
-        args.driver, args.service, args.method, json.loads(args.args), args.timeout
+        args.driver, args.service, args.method, args.args, args.timeout
     )
     pprint.pprint(resp)
 
