@@ -48,11 +48,11 @@ def main():
     client = mqttclient.Client("mqtt-rpc-client-%d" % os.getpid())
 
     url = urlparse(args.mqtt_url)
-    if url.scheme = "mqtt-tcp":
+    if url.scheme == "mqtt-tcp":
         if url.username:
             client.username_pw_set(url.username, url.password)
         client.connect(url.hostname, url.port)
-    else if url.scheme = "unix":
+    else if url.scheme == "unix":
         client.sock_connect(url.path)
     else:
         print("Unkown mqtt url scheme")
