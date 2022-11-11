@@ -14,7 +14,7 @@ from jsonrpc.exceptions import JSONRPCError
 def main():
     parser = argparse.ArgumentParser(description="Sample RPC client", add_help=False)
     parser.add_argument(
-        "-m", "--mqtt_url", dest="mqtt_url", type=str, help="MQTT url", default="unix:///var/run/mosquitto/mosquitto.sock"
+        "-b", "--broker_url", dest="broker_url", type=str, help="MQTT url", default="unix:///var/run/mosquitto/mosquitto.sock"
     )
     parser.add_argument(
         "-d",
@@ -47,7 +47,7 @@ def main():
 
     client = mqttclient.Client("mqtt-rpc-client-%d" % os.getpid())
 
-    url = urlparse(args.mqtt_url)
+    url = urlparse(args.broker_url)
     if url.scheme == "mqtt-tcp":
         if url.username:
             client.username_pw_set(url.username, url.password)
