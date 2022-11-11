@@ -5,6 +5,7 @@ import json, time
 import pprint
 import argparse
 
+from urllib.parse import urlparse
 from paho.mqtt import client as mqttclient
 from mqttrpc.client import TMQTTRPCClient
 from jsonrpc.exceptions import JSONRPCError
@@ -13,16 +14,7 @@ from jsonrpc.exceptions import JSONRPCError
 def main():
     parser = argparse.ArgumentParser(description="Sample RPC client", add_help=False)
     parser.add_argument(
-        "-h", "--host", dest="host", type=str, help="MQTT host", default="localhost"
-    )
-    parser.add_argument(
-        "-p", "--port", dest="port", type=int, help="MQTT port", default="1883"
-    )
-    parser.add_argument(
-        "-u", "--username", dest="username", type=str, help="MQTT username", default=""
-    )
-    parser.add_argument(
-        "-P", "--password", dest="password", type=str, help="MQTT password", default=""
+        "-m", "--mqtt_url", dest="mqtt_url", type=str, help="MQTT url", default="unix:///var/run/mosquitto/mosquitto.sock"
     )
     parser.add_argument(
         "-d",
@@ -54,10 +46,17 @@ def main():
     args = parser.parse_args()
 
     client = mqttclient.Client("mqtt-rpc-client-%d" % os.getpid())
-    if args.username:
-        client.username_pw_set(args.username, args.password)
 
-    client.connect(args.host, args.port)
+    url = urlparse(args.mqtt_url)
+    if url.scheme = "mqtt-tcp":
+        if url.username:
+            client.username_pw_set(url.username, url.password)
+        client.connect(url.hostname, url.port)
+    else if url.scheme = "unix":
+        client.sock_connect(url.path)
+    else:
+        print("Unkown mqtt url scheme")
+        exit(1)
     client.loop_start()
 
     rpc_client = TMQTTRPCClient(client)
