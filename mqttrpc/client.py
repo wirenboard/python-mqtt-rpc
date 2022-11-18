@@ -1,5 +1,4 @@
 import json
-import six
 
 try:
     import mosquitto
@@ -62,7 +61,7 @@ class TMQTTRPCClient(object):
         self.counter = 0
         self.futures = {}
         self.subscribes = set()
-        if six.PY3 and type(self.client._client_id) is bytes:
+        if type(self.client._client_id) is bytes:
             self.rpc_client_id = self.client._client_id.decode().replace('/','_')
         else:
             self.rpc_client_id = str(self.client._client_id).replace('/','_')

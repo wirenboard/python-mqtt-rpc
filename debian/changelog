@@ -1,3 +1,9 @@
+python-mqttrpc (1.1.4) stable; urgency=medium
+
+  * Add simple client to installation
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Fri, 04 Nov 2022 21:13:00 +0300
+
 python-mqttrpc (1.1.3) stable; urgency=medium
 
   * add compatibility with python 3.10
