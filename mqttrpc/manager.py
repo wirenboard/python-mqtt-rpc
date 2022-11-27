@@ -29,23 +29,44 @@ class MQTTRPCResponseManager(object):
 
     """
 
-
     @classmethod
-    def handle(cls, request_str, service_id, method_id, dispatcher):
+    def _prepare_request(cls, request_str):
         if isinstance(request_str, bytes):
             request_str = request_str.decode("utf-8")
-
         try:
             json.loads(request_str)
         except (TypeError, ValueError):
-            return MQTTRPC10Response(error=JSONRPCParseError()._data)
-
+            return None, MQTTRPC10Response(error=JSONRPCParseError()._data)
         try:
             request = MQTTRPC10Request.from_json(request_str)
         except JSONRPCInvalidRequestException:
-            return MQTTRPC10Response(error=JSONRPCInvalidRequest()._data)
+            return None, MQTTRPC10Response(error=JSONRPCInvalidRequest()._data)
 
-        return cls.handle_request(request, service_id, method_id, dispatcher)
+        return request, None
+
+    @classmethod
+    def handle(cls, request_str, service_id, method_id, dispatcher):
+        request, erroneous_response = cls._prepare_request(request_str)
+        if request:
+            return cls.handle_request(request, service_id, method_id, dispatcher)
+        else:
+            return erroneous_response
+
+    @classmethod
+    def _process_exception(cls, request, e):
+        data = {
+            "type": e.__class__.__name__,
+            "args": e.args,
+            "message": str(e),
+        }
+
+        if isinstance(e, JSONRPCDispatchException):
+            return MQTTRPC10Response(_id=request._id, error=e.error._data)
+        elif isinstance(e, TypeError) and is_invalid_params(method, *request.args, **request.kwargs):
+            return MQTTRPC10Response(_id=request._id, error=JSONRPCInvalidParams(data=data)._data)
+        else:
+            logger.exception("API Exception: {0}".format(data))
+            return MQTTRPC10Response(_id=request._id, error=JSONRPCServerError(data=data)._data)
 
     @classmethod
     def handle_request(cls, request, service_id, method_id, dispatcher):
@@ -59,36 +80,17 @@ class MQTTRPCResponseManager(object):
         .. versionadded: 1.8.0
 
         """
-
-        def response(**kwargs):
-            return MQTTRPC10Response(
-                _id=request._id, **kwargs)
-
         try:
             method = dispatcher[(service_id, method_id)]
         except KeyError:
-            output = response(error=JSONRPCMethodNotFound()._data)
+            output = MQTTRPC10Response(_id=request._id, error=JSONRPCMethodNotFound()._data)
         else:
             try:
                 result = method(*request.args, **request.kwargs)
-            except JSONRPCDispatchException as e:
-                output = response(error=e.error._data)
             except Exception as e:
-                data = {
-                    "type": e.__class__.__name__,
-                    "args": e.args,
-                    "message": str(e),
-                }
-                if isinstance(e, TypeError) and is_invalid_params(
-                        method, *request.args, **request.kwargs):
-                    output = response(
-                        error=JSONRPCInvalidParams(data=data)._data)
-                else:
-                    logger.exception("API Exception: {0}".format(data))
-                    output = response(
-                        error=JSONRPCServerError(data=data)._data)
+                output = cls._process_exception(request, e)
             else:
-                output = response(result=result)
+                output = MQTTRPC10Response(_id=request._id, result=result)
         finally:
             if not request.is_notification:
                 return output
@@ -96,3 +98,34 @@ class MQTTRPCResponseManager(object):
                 return []
 
 
+class AMQTTRPCResponseManager(MQTTRPCResponseManager):
+    """
+    asyncio-compatible version of MQTTRPCResponseManager
+    """
+
+    @classmethod
+    async def handle(cls, request_str, service_id, method_id, dispatcher):
+        request, erroneous_response = cls._prepare_request(request_str)
+        if request:
+            return await cls.handle_request(request, service_id, method_id, dispatcher)
+        else:
+            return erroneous_response
+
+    @classmethod
+    async def handle_request(cls, request, service_id, method_id, dispatcher):
+        try:
+            method = dispatcher[(service_id, method_id)]
+        except KeyError:
+            output = MQTTRPC10Response(_id=request._id, error=JSONRPCMethodNotFound()._data)
+        else:
+            try:
+                result = await method(*request.args, **request.kwargs)
+            except Exception as e:
+                output = cls._process_exception(request, e)
+            else:
+                output = MQTTRPC10Response(_id=request._id, result=result)
+        finally:
+            if not request.is_notification:
+                return output
+            else:
+                return []

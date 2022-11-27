@@ -1,6 +1,7 @@
 python-mqttrpc (1.1.5) stable; urgency=medium
 
   * TMQTTRPCClient.call_async: add a result_future param
+  * add asyncio-compatible version of MQTTRPCResponseManager
 
  -- Vladimir Romanov <v.romanov@wirenboard.ru>  Sun, 27 Nov 2022 18:39:12 +0300
 
