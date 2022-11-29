@@ -107,12 +107,12 @@ class TMQTTRPCClient(object):
 
 
 
-    def call_async(self, driver, service, method, params):
+    def call_async(self, driver, service, method, params, result_future=AsyncResult):
         self.counter += 1
         payload = {'params': params,
                    'id' : self.counter}
 
-        result = AsyncResult()
+        result = result_future()
         result.packet_id = self.counter
         self.futures[(driver, service, method, self.counter)] = result
 
@@ -130,5 +130,3 @@ class TMQTTRPCClient(object):
         self.client.publish(topic, json.dumps(payload))
 
         return result
-
-
