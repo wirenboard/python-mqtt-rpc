@@ -1,16 +1,15 @@
 import json
 
-from jsonrpc.utils import JSONSerializable
 from jsonrpc import six
 from jsonrpc.exceptions import JSONRPCError, JSONRPCInvalidRequestException
+from jsonrpc.utils import JSONSerializable
 
 
 class MQTTRPCBaseRequest(JSONSerializable):
 
-    """ Base class for JSON-RPC 1.0 and JSON-RPC 2.0 requests."""
+    """Base class for JSON-RPC 1.0 and JSON-RPC 2.0 requests."""
 
-    def __init__(self, params=None, _id=None,
-                 is_notification=None):
+    def __init__(self, params=None, _id=None, is_notification=None):
         self.data = dict()
         self.params = params
         self._id = _id
@@ -29,7 +28,7 @@ class MQTTRPCBaseRequest(JSONSerializable):
 
     @property
     def args(self):
-        """ Method position arguments.
+        """Method position arguments.
 
         :return tuple args: method position arguments.
 
@@ -38,7 +37,7 @@ class MQTTRPCBaseRequest(JSONSerializable):
 
     @property
     def kwargs(self):
-        """ Method named arguments.
+        """Method named arguments.
 
         :return dict kwargs: method named arguments.
 
@@ -52,7 +51,7 @@ class MQTTRPCBaseRequest(JSONSerializable):
 
 class MQTTRPCBaseResponse(JSONSerializable):
 
-    """ Base class for JSON-RPC 1.0 and JSON-RPC 2.0 responses."""
+    """Base class for JSON-RPC 1.0 and JSON-RPC 2.0 responses."""
 
     def __init__(self, result=None, error=None, _id=None):
         self.data = dict()
@@ -80,11 +79,9 @@ class MQTTRPCBaseResponse(JSONSerializable):
         return self.serialize(self.data)
 
 
-
-
 class MQTTRPC10Request(MQTTRPCBaseRequest):
 
-    """ A rpc call is represented by sending a Request object to a Server.
+    """A rpc call is represented by sending a Request object to a Server.
 
     :param params: A Structured value that holds the parameter values to be
         used during the invocation of the method. This member MAY be omitted.
@@ -119,10 +116,7 @@ class MQTTRPC10Request(MQTTRPCBaseRequest):
 
     @property
     def data(self):
-        data = dict(
-            (k, v) for k, v in self._data.items()
-            if not (k == "id" and self.is_notification)
-        )
+        data = dict((k, v) for k, v in self._data.items() if not (k == "id" and self.is_notification))
         return data
 
     @data.setter
@@ -152,8 +146,7 @@ class MQTTRPC10Request(MQTTRPCBaseRequest):
 
     @_id.setter
     def _id(self, value):
-        if value is not None and \
-           not isinstance(value, six.string_types + six.integer_types):
+        if value is not None and not isinstance(value, six.string_types + six.integer_types):
             raise ValueError("id should be string or integer")
 
         self._data["id"] = value
@@ -162,13 +155,11 @@ class MQTTRPC10Request(MQTTRPCBaseRequest):
     def from_json(cls, json_str):
         data = cls.deserialize(json_str)
 
-
         if not data:
             raise JSONRPCInvalidRequestException("[] value is not accepted")
 
         if not isinstance(data, dict):
-            raise JSONRPCInvalidRequestException(
-                "Request should be an object (dict)")
+            raise JSONRPCInvalidRequestException("Request should be an object (dict)")
 
         result = None
         if not cls.REQUIRED_FIELDS <= set(data.keys()) <= cls.POSSIBLE_FIELDS:
@@ -180,18 +171,18 @@ class MQTTRPC10Request(MQTTRPCBaseRequest):
         try:
             result = MQTTRPC10Request(
                 params=data.get("params"),
-                _id=data.get("id"), is_notification="id" not in data,
+                _id=data.get("id"),
+                is_notification="id" not in data,
             )
         except ValueError as e:
             raise JSONRPCInvalidRequestException(str(e))
 
-        return  result
-
+        return result
 
 
 class MQTTRPC10Response(MQTTRPCBaseResponse):
 
-    """ JSON-RPC response object to JSONRPC20Request.
+    """JSON-RPC response object to JSONRPC20Request.
 
     When a rpc call is made, the Server MUST reply with a Response, except for
     in the case of Notifications. The Response is expressed as a single JSON
@@ -220,8 +211,8 @@ class MQTTRPC10Response(MQTTRPCBaseResponse):
 
     """
 
-    REQUIRED_FIELDS = set(['id'])
-    POSSIBLE_FIELDS =  set(['error', 'id', 'result'])
+    REQUIRED_FIELDS = set(["id"])
+    POSSIBLE_FIELDS = set(["error", "id", "result"])
 
     @property
     def data(self):
@@ -266,24 +257,17 @@ class MQTTRPC10Response(MQTTRPCBaseResponse):
 
     @_id.setter
     def _id(self, value):
-        if value is not None and \
-           not isinstance(value, six.string_types + six.integer_types):
+        if value is not None and not isinstance(value, six.string_types + six.integer_types):
             raise ValueError("id should be string or integer")
 
         self._data["id"] = value
-
-
-
-
-
 
     @classmethod
     def from_json(cls, json_str):
         data = cls.deserialize(json_str)
 
         if not isinstance(data, dict):
-            raise JSONRPCInvalidRequestException(
-                "Response should be an object (dict)")
+            raise JSONRPCInvalidRequestException("Response should be an object (dict)")
 
         result = None
         if not cls.REQUIRED_FIELDS <= set(data.keys()) <= cls.POSSIBLE_FIELDS:
@@ -293,12 +277,8 @@ class MQTTRPC10Response(MQTTRPCBaseResponse):
             raise JSONRPCInvalidRequestException(msg.format(extra, missed))
 
         try:
-            result = MQTTRPC10Response(
-                error=data.get("error"),
-                result=data.get("result"),
-                _id=data.get("id")
-            )
+            result = MQTTRPC10Response(error=data.get("error"), result=data.get("result"), _id=data.get("id"))
         except ValueError as e:
             raise JSONRPCInvalidRequestException(str(e))
 
-        return  result
+        return result

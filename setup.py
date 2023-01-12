@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 
 def read(fname):
@@ -9,18 +10,17 @@ def read(fname):
     except IOError:
         return ""
 
+
 setup(
     name="mqttrpc",
     version="1.0",
     packages=find_packages(),
-
     # metadata for upload to PyPI
     author="Evgeny Boger",
     author_email="boger@contactless.ru",
     url="https://github.com/wirenboard/python-mqtt-rpc",
     description="WB MQTT-RPC reference implementation",
-    long_description=read('README.md'),
-
+    long_description=read("README.md"),
     # Full list:
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
