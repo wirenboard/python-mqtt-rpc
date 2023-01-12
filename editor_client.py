@@ -1,4 +1,5 @@
-import mqttrpc.client 
+import mqttrpc.client
+
 try:
     import mosquitto
 except ImportError:

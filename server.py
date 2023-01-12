@@ -6,12 +6,13 @@ try:
 except ImportError:
     import paho.mqtt.client as mosquitto
 
-import time, random
+import logging
+import random
 import sys
+import time
 
 from mqttrpc import MQTTRPCResponseManager, dispatcher
 
-import logging
 logging.getLogger().setLevel(logging.DEBUG)
 
 @dispatcher.add_method

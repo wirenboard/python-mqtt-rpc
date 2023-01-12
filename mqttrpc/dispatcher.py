@@ -8,10 +8,10 @@ from collections.abc import MutableMapping
 
 class Dispatcher(MutableMapping):
 
-    """ Dictionary like object which maps method_name to method."""
+    """Dictionary like object which maps method_name to method."""
 
     def __init__(self, prototype=None):
-        """ Build method dispatcher.
+        """Build method dispatcher.
 
         Parameters
         ----------
@@ -41,7 +41,6 @@ class Dispatcher(MutableMapping):
                 self.method_map[key] = value
                 return
 
-
         raise RuntimeError("key must be tuple or list of (service, method)")
 
     def __delitem__(self, key):
@@ -66,7 +65,7 @@ class Dispatcher(MutableMapping):
         self.build_method_map(dict)
 
     def add_method(self, f, service=None, name=None):
-        """ Add a method to the dispatcher.
+        """Add a method to the dispatcher.
 
         Parameters
         ----------
@@ -100,17 +99,16 @@ class Dispatcher(MutableMapping):
         """
 
         if service is None:
-            if hasattr(f, 'im_class'):
+            if hasattr(f, "im_class"):
                 service = f.im_class.__name__
             else:
-                service = 'main'
+                service = "main"
 
         self.method_map[(service, name or f.__name__)] = f
         return f
 
-
     def build_method_map(self, prototype):
-        """ Add prototype methods to the dispatcher.
+        """Add prototype methods to the dispatcher.
 
         Parameters
         ----------
@@ -122,13 +120,14 @@ class Dispatcher(MutableMapping):
             be used.
         """
 
-
         if not isinstance(prototype, dict):
-            service = prototype.__class__.__name__.lower() + '.'
+            service = prototype.__class__.__name__.lower() + "."
 
-            prototype = dict(((service, method), getattr(prototype, method))
-                             for method in dir(prototype)
-                             if not method.startswith('_'))
+            prototype = dict(
+                ((service, method), getattr(prototype, method))
+                for method in dir(prototype)
+                if not method.startswith("_")
+            )
 
         for attr, method in prototype.items():
             if callable(method):

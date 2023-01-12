@@ -1,22 +1,25 @@
 import json
 import logging
-from jsonrpc.utils import is_invalid_params
+
 from jsonrpc.exceptions import (
+    JSONRPCDispatchException,
     JSONRPCInvalidParams,
     JSONRPCInvalidRequest,
     JSONRPCInvalidRequestException,
     JSONRPCMethodNotFound,
     JSONRPCParseError,
     JSONRPCServerError,
-    JSONRPCDispatchException,
 )
+from jsonrpc.utils import is_invalid_params
+
 from .protocol import MQTTRPC10Request, MQTTRPC10Response
+
 logger = logging.getLogger(__name__)
 
 
 class MQTTRPCResponseManager(object):
 
-    """ MQTT-RPC response manager.
+    """MQTT-RPC response manager.
 
     Method brings syntactic sugar into library. Given dispatcher it handles
     request (both single and batch) and handles errors.
@@ -70,7 +73,7 @@ class MQTTRPCResponseManager(object):
 
     @classmethod
     def handle_request(cls, request, service_id, method_id, dispatcher):
-        """ Handle request data.
+        """Handle request data.
 
         At this moment request has correct jsonrpc format.
 
