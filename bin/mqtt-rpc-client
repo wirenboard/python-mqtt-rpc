@@ -9,8 +9,9 @@ from urllib.parse import urlparse
 
 import paho_socket
 from jsonrpc.exceptions import JSONRPCError
-from mqttrpc.client import MQTTRPCError, TMQTTRPCClient
 from paho.mqtt import client as mqttclient
+
+from mqttrpc.client import MQTTRPCError, TMQTTRPCClient
 
 
 def main():
