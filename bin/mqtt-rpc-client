@@ -7,7 +7,7 @@ import argparse
 
 from urllib.parse import urlparse
 from paho.mqtt import client as mqttclient
-from mqttrpc.client import TMQTTRPCClient
+from mqttrpc.client import TMQTTRPCClient, MQTTRPCError
 from jsonrpc.exceptions import JSONRPCError
 import paho_socket
 
@@ -64,10 +64,13 @@ def main():
     rpc_client = TMQTTRPCClient(client)
     client.on_message = rpc_client.on_mqtt_message
 
-    resp = rpc_client.call(
-        args.driver, args.service, args.method, args.args, args.timeout
-    )
-    pprint.pprint(resp)
+    try:
+        resp = rpc_client.call(
+            args.driver, args.service, args.method, args.args, args.timeout
+        )
+        pprint.pprint(resp)
+    except MQTTRPCError as e:
+        print("Error: %s" % e)
 
 
 if __name__ == "__main__":
