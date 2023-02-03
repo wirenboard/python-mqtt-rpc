@@ -1,49 +1,34 @@
 #!/usr/bin/env python3
 
-import os
-import json, time
-import pprint
 import argparse
-
+import json
+import os
+import pprint
+import time
 from urllib.parse import urlparse
-from paho.mqtt import client as mqttclient
-from mqttrpc.client import TMQTTRPCClient
-from jsonrpc.exceptions import JSONRPCError
+
 import paho_socket
+from jsonrpc.exceptions import JSONRPCError
+from paho.mqtt import client as mqttclient
+
+from mqttrpc.client import MQTTRPCError, TMQTTRPCClient
 
 
 def main():
     parser = argparse.ArgumentParser(description="Sample RPC client", add_help=False)
     parser.add_argument(
-        "-b", "--broker_url", dest="broker_url", type=str, help="MQTT url", default="unix:///var/run/mosquitto/mosquitto.sock"
-    )
-    parser.add_argument(
-        "-d",
-        "--driver",
-        dest="driver",
+        "-b",
+        "--broker_url",
+        dest="broker_url",
         type=str,
-        help="Driver name"
+        help="MQTT url",
+        default="unix:///var/run/mosquitto/mosquitto.sock",
     )
-    parser.add_argument(
-        "-s",
-        "--service",
-        dest="service",
-        type=str,
-        help="Service name"
-    )
-    parser.add_argument(
-        "-m",
-        "--method",
-        dest="method",
-        type=str,
-        help="Method name"
-    )
-    parser.add_argument(
-        "-a", "--args", dest="args", type=json.loads, help="Method arguments"
-    )
-    parser.add_argument(
-        "-t", "--timeout", dest="timeout", type=int, help="Timeout", default=10
-    )
+    parser.add_argument("-d", "--driver", dest="driver", type=str, help="Driver name")
+    parser.add_argument("-s", "--service", dest="service", type=str, help="Service name")
+    parser.add_argument("-m", "--method", dest="method", type=str, help="Method name")
+    parser.add_argument("-a", "--args", dest="args", type=json.loads, help="Method arguments")
+    parser.add_argument("-t", "--timeout", dest="timeout", type=int, help="Timeout", default=10)
     args = parser.parse_args()
 
     url = urlparse(args.broker_url)
@@ -64,10 +49,11 @@ def main():
     rpc_client = TMQTTRPCClient(client)
     client.on_message = rpc_client.on_mqtt_message
 
-    resp = rpc_client.call(
-        args.driver, args.service, args.method, args.args, args.timeout
-    )
-    pprint.pprint(resp)
+    try:
+        resp = rpc_client.call(args.driver, args.service, args.method, args.args, args.timeout)
+        pprint.pprint(resp)
+    except MQTTRPCError as e:
+        print("Error: %s" % e)
 
 
 if __name__ == "__main__":

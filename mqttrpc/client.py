@@ -93,7 +93,11 @@ class TMQTTRPCClient(object):
 
         if result.error:
             future.set_exception(
-                MQTTRPCError(result.error["message"], result.error["code"], result.error["data"])
+                MQTTRPCError(
+                    result.error["message"],
+                    result.error["code"],
+                    result.error["data"] if "data" in result.error else None,
+                )
             )
 
         future.set_result(result.result)
