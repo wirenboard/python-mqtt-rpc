@@ -11,7 +11,7 @@ import paho_socket
 from jsonrpc.exceptions import JSONRPCError
 from paho.mqtt import client as mqttclient
 
-from mqttrpc.client import TimeoutError, MQTTRPCError, TMQTTRPCClient
+from mqttrpc.client import MQTTRPCError, TimeoutError, TMQTTRPCClient
 
 
 def main():
