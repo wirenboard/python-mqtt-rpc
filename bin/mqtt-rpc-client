@@ -11,7 +11,7 @@ import paho_socket
 from jsonrpc.exceptions import JSONRPCError
 from paho.mqtt import client as mqttclient
 
-from mqttrpc.client import MQTTRPCError, TMQTTRPCClient
+from mqttrpc.client import TimeoutError, MQTTRPCError, TMQTTRPCClient
 
 
 def main():
@@ -54,6 +54,8 @@ def main():
         pprint.pprint(resp)
     except MQTTRPCError as e:
         print("Error: %s" % e)
+    except TimeoutError:
+        print("Request timed out")
 
 
 if __name__ == "__main__":
