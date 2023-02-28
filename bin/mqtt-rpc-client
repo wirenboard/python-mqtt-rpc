@@ -6,7 +6,7 @@ import pprint
 
 from jsonrpc.exceptions import JSONRPCError
 from mqttrpc.client import MQTTRPCError, TimeoutError, TMQTTRPCClient
-from wb_common.mqtt_client import MQTTClient
+from wb_common.mqtt_client import DEFAULT_BROKER_URL, MQTTClient
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
         dest="broker_url",
         type=str,
         help="MQTT broker url",
-        default="unix:///var/run/mosquitto/mosquitto.sock",
+        default=DEFAULT_BROKER_URL,
     )
     parser.add_argument("-d", "--driver", dest="driver", type=str, help="Driver name")
     parser.add_argument("-s", "--service", dest="service", type=str, help="Service name")
