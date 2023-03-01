@@ -2,14 +2,10 @@
 
 import argparse
 import json
-import os
 import pprint
-import time
-from urllib.parse import urlparse
 
-import paho_socket
 from jsonrpc.exceptions import JSONRPCError
-from paho.mqtt import client as mqttclient
+from wb_common.mqtt_client import DEFAULT_BROKER_URL, MQTTClient
 
 from mqttrpc.client import MQTTRPCError, TimeoutError, TMQTTRPCClient
 
@@ -18,11 +14,11 @@ def main():
     parser = argparse.ArgumentParser(description="Sample RPC client", add_help=False)
     parser.add_argument(
         "-b",
-        "--broker_url",
+        "--broker",
         dest="broker_url",
         type=str,
-        help="MQTT url",
-        default="unix:///var/run/mosquitto/mosquitto.sock",
+        help="MQTT broker url",
+        default=DEFAULT_BROKER_URL,
     )
     parser.add_argument("-d", "--driver", dest="driver", type=str, help="Driver name")
     parser.add_argument("-s", "--service", dest="service", type=str, help="Service name")
@@ -31,31 +27,20 @@ def main():
     parser.add_argument("-t", "--timeout", dest="timeout", type=int, help="Timeout in seconds", default=10)
     args = parser.parse_args()
 
-    url = urlparse(args.broker_url)
-    client_id = "mqtt-rpc-client-%d" % os.getpid()
-    if url.scheme == "mqtt-tcp":
-        client = mqttclient.Client(client_id)
-        if url.username:
-            client.username_pw_set(url.username, url.password)
-        client.connect(url.hostname, url.port)
-    elif url.scheme == "unix":
-        client = paho_socket.Client(client_id)
-        client.sock_connect(url.path)
-    else:
-        print("Unkown mqtt url scheme")
-        exit(1)
-    client.loop_start()
-
-    rpc_client = TMQTTRPCClient(client)
-    client.on_message = rpc_client.on_mqtt_message
-
     try:
+        mqtt_client = MQTTClient("mqtt-rpc-client", args.broker_url)
+        rpc_client = TMQTTRPCClient(mqtt_client)
+        mqtt_client.on_message = rpc_client.on_mqtt_message
+        mqtt_client.start()
+
         resp = rpc_client.call(args.driver, args.service, args.method, args.args, args.timeout)
         pprint.pprint(resp)
-    except MQTTRPCError as e:
-        print("Error: %s" % e)
     except TimeoutError:
         print("Request timed out")
+    except Exception as e:
+        print("Error: %s" % e)
+    finally:
+        mqtt_client.stop()
 
 
 if __name__ == "__main__":

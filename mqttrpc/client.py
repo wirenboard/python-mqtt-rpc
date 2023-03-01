@@ -1,12 +1,7 @@
 import json
-
-try:
-    import mosquitto
-except ImportError:
-    import paho.mqtt.client as mosquitto
-
 import threading
 
+import paho.mqtt.client as mqtt
 from jsonrpc.exceptions import JSONRPCError
 
 # ~ from concurrent.futures import Future
@@ -76,7 +71,7 @@ class TMQTTRPCClient(object):
     def on_mqtt_message(self, mosq, obj, msg):
         """return True if the message was indeed an rpc call"""
 
-        if not mosquitto.topic_matches_sub("/rpc/v1/+/+/+/%s/reply" % self.rpc_client_id, msg.topic):
+        if not mqtt.topic_matches_sub("/rpc/v1/+/+/+/%s/reply" % self.rpc_client_id, msg.topic):
             return
 
         parts = msg.topic.split("/")
