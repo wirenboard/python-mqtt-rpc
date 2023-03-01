@@ -5,8 +5,9 @@ import json
 import pprint
 
 from jsonrpc.exceptions import JSONRPCError
-from mqttrpc.client import MQTTRPCError, TimeoutError, TMQTTRPCClient
 from wb_common.mqtt_client import DEFAULT_BROKER_URL, MQTTClient
+
+from mqttrpc.client import MQTTRPCError, TimeoutError, TMQTTRPCClient
 
 
 def main():
