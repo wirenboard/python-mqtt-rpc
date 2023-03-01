@@ -31,7 +31,7 @@ def main():
         mqtt_client = MQTTClient("mqtt-rpc-client", args.broker_url)
         rpc_client = TMQTTRPCClient(mqtt_client)
         mqtt_client.on_message = rpc_client.on_mqtt_message
-        mqtt_client.connect()
+        mqtt_client.start()
 
         resp = rpc_client.call(args.driver, args.service, args.method, args.args, args.timeout)
         pprint.pprint(resp)
@@ -39,6 +39,8 @@ def main():
         print("Request timed out")
     except Exception as e:
         print("Error: %s" % e)
+    finally:
+        mqtt_client.stop()
 
 
 if __name__ == "__main__":
