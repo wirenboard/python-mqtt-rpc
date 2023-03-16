@@ -2,7 +2,6 @@
 
 import argparse
 import json
-import pprint
 
 from jsonrpc.exceptions import JSONRPCError
 from wb_common.mqtt_client import DEFAULT_BROKER_URL, MQTTClient
@@ -11,7 +10,9 @@ from mqttrpc.client import MQTTRPCError, TimeoutError, TMQTTRPCClient
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Sample RPC client", add_help=False)
+    parser = argparse.ArgumentParser(
+        description="Sample RPC client", add_help=True, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
     parser.add_argument(
         "-b",
         "--broker",
@@ -20,9 +21,9 @@ def main():
         help="MQTT broker url",
         default=DEFAULT_BROKER_URL,
     )
-    parser.add_argument("-d", "--driver", dest="driver", type=str, help="Driver name")
-    parser.add_argument("-s", "--service", dest="service", type=str, help="Service name")
-    parser.add_argument("-m", "--method", dest="method", type=str, help="Method name")
+    parser.add_argument("-d", "--driver", dest="driver", type=str, help="Driver name", required=True)
+    parser.add_argument("-s", "--service", dest="service", type=str, help="Service name", required=True)
+    parser.add_argument("-m", "--method", dest="method", type=str, help="Method name", required=True)
     parser.add_argument("-a", "--args", dest="args", type=json.loads, help="Method arguments")
     parser.add_argument("-t", "--timeout", dest="timeout", type=int, help="Timeout in seconds", default=10)
     args = parser.parse_args()
@@ -34,7 +35,7 @@ def main():
         mqtt_client.start()
 
         resp = rpc_client.call(args.driver, args.service, args.method, args.args, args.timeout)
-        pprint.pprint(resp)
+        print(json.dumps(resp))
     except TimeoutError:
         print("Request timed out")
     except Exception as e:
