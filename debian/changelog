@@ -1,3 +1,9 @@
+python-mqttrpc (1.2.1) stable; urgency=medium
+
+  * add Homepage to debian/control (no functional changes)
+
+ -- Nikita Maslov <nikita.maslov@wirenboard.ru>  Thu, 30 Mar 2023 16:38:06 +0600
+
 python-mqttrpc (1.2.0) stable; urgency=medium
 
   * mqtt-rpc-client: print response as JSON

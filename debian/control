@@ -5,6 +5,7 @@ Priority: optional
 Build-Depends: python3, dh-python, python3-setuptools, debhelper (>= 9)
 Standards-Version: 3.9.1
 X-Python3-Version: >= 3.5
+Homepage: https://github.com/wirenboard/python-mqtt-rpc
 
 Package: python3-mqttrpc
 Architecture: all
