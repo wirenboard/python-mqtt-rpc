@@ -4,6 +4,11 @@ import os
 from setuptools import find_packages, setup
 
 
+def get_version():
+    with open("debian/changelog", "r", encoding="utf-8") as f:
+        return f.readline().split()[1][1:-1]
+
+
 def read(fname):
     try:
         return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -13,11 +18,13 @@ def read(fname):
 
 setup(
     name="mqttrpc",
-    version="1.0",
+    version=get_version(),
     packages=find_packages(),
     # metadata for upload to PyPI
     author="Evgeny Boger",
     author_email="boger@contactless.ru",
+    maintainer="Wiren Board Team",
+    maintainer_email="info@wirenboard.com",
     url="https://github.com/wirenboard/python-mqtt-rpc",
     description="WB MQTT-RPC reference implementation",
     long_description=read("README.md"),
