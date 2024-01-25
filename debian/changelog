@@ -1,3 +1,9 @@
+python-mqttrpc (1.2.3) stable; urgency=medium
+
+  * mqtt-rpc-client: fix default value of --args option
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Wed, 24 Jan 2024 16:00:00 +0400
+
 python-mqttrpc (1.2.2) stable; urgency=medium
 
   * Fix PKG-INFO

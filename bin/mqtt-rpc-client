@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=invalid-name
 
 import argparse
 import json
@@ -24,7 +25,7 @@ def main():
     parser.add_argument("-d", "--driver", dest="driver", type=str, help="Driver name", required=True)
     parser.add_argument("-s", "--service", dest="service", type=str, help="Service name", required=True)
     parser.add_argument("-m", "--method", dest="method", type=str, help="Method name", required=True)
-    parser.add_argument("-a", "--args", dest="args", type=json.loads, help="Method arguments")
+    parser.add_argument("-a", "--args", dest="args", type=json.loads, help="Method arguments", default={})
     parser.add_argument("-t", "--timeout", dest="timeout", type=int, help="Timeout in seconds", default=10)
     args = parser.parse_args()
 
