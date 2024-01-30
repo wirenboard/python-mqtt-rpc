@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import sys
 
 from jsonrpc.exceptions import JSONRPCError
 from wb_common.mqtt_client import DEFAULT_BROKER_URL, MQTTClient
@@ -39,11 +40,16 @@ def main():
         print(json.dumps(resp))
     except TimeoutError:
         print("Request timed out")
+        sys.exit(124)
     except Exception as e:
         print("Error: %s" % e)
+        sys.exit(1)
     finally:
         mqtt_client.stop()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(0)
