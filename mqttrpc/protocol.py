@@ -6,7 +6,6 @@ from jsonrpc.utils import JSONSerializable
 
 
 class MQTTRPCBaseRequest(JSONSerializable):
-
     """Base class for JSON-RPC 1.0 and JSON-RPC 2.0 requests."""
 
     def __init__(self, params=None, _id=None, is_notification=None):
@@ -50,7 +49,6 @@ class MQTTRPCBaseRequest(JSONSerializable):
 
 
 class MQTTRPCBaseResponse(JSONSerializable):
-
     """Base class for JSON-RPC 1.0 and JSON-RPC 2.0 responses."""
 
     def __init__(self, result=None, error=None, _id=None):
@@ -80,7 +78,6 @@ class MQTTRPCBaseResponse(JSONSerializable):
 
 
 class MQTTRPC10Request(MQTTRPCBaseRequest):
-
     """A rpc call is represented by sending a Request object to a Server.
 
     :param params: A Structured value that holds the parameter values to be
@@ -181,7 +178,6 @@ class MQTTRPC10Request(MQTTRPCBaseRequest):
 
 
 class MQTTRPC10Response(MQTTRPCBaseResponse):
-
     """JSON-RPC response object to JSONRPC20Request.
 
     When a rpc call is made, the Server MUST reply with a Response, except for

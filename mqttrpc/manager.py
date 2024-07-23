@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 
 
 class MQTTRPCResponseManager(object):
-
     """MQTT-RPC response manager.
 
     Method brings syntactic sugar into library. Given dispatcher it handles
