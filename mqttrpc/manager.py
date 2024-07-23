@@ -56,7 +56,7 @@ class MQTTRPCResponseManager(object):
             return erroneous_response
 
     @classmethod
-    def _process_exception(cls, request, e):
+    def _process_exception(cls, request, method, e):
         data = {
             "type": e.__class__.__name__,
             "args": e.args,
@@ -91,7 +91,7 @@ class MQTTRPCResponseManager(object):
             try:
                 result = method(*request.args, **request.kwargs)
             except Exception as e:
-                output = cls._process_exception(request, e)
+                output = cls._process_exception(request, method, e)
             else:
                 output = MQTTRPC10Response(_id=request._id, result=result)
         finally:
@@ -124,7 +124,7 @@ class AMQTTRPCResponseManager(MQTTRPCResponseManager):
             try:
                 result = await method(*request.args, **request.kwargs)
             except Exception as e:
-                output = cls._process_exception(request, e)
+                output = cls._process_exception(request, method, e)
             else:
                 output = MQTTRPC10Response(_id=request._id, result=result)
         finally:
