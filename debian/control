@@ -1,5 +1,5 @@
 Source: python-mqttrpc
-Maintainer: Evgeny Boger <boger@contactless.ru>
+Maintainer: Wiren Board team <info@wirenboard.com>
 Section: python
 Priority: optional
 Build-Depends: python3, dh-python, python3-setuptools, debhelper (>= 9)
@@ -10,5 +10,6 @@ Homepage: https://github.com/wirenboard/python-mqtt-rpc
 Package: python3-mqttrpc
 Architecture: all
 XB-Python-Version: ${python3:Version}
-Depends: python3, ${misc:Depends}, ${shlibs:Depends}, python3-json-rpc, python3-paho-mqtt, python3-wb-common (>= 2.1.0)
+Depends: python3, ${misc:Depends}, ${shlibs:Depends}, python3-jsonrpc, python3-paho-mqtt, python3-wb-common (>= 2.1.0)
 Description: Reference MQTT-RPC implementation
+ Python implementation of MQTT-RPC.
