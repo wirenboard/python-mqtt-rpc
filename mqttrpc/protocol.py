@@ -1,6 +1,5 @@
 import json
 
-from jsonrpc import six
 from jsonrpc.exceptions import JSONRPCError, JSONRPCInvalidRequestException
 from jsonrpc.utils import JSONSerializable
 
@@ -143,7 +142,7 @@ class MQTTRPC10Request(MQTTRPCBaseRequest):
 
     @_id.setter
     def _id(self, value):
-        if value is not None and not isinstance(value, six.string_types + six.integer_types):
+        if value is not None and not isinstance(value, (str, int)):
             raise ValueError("id should be string or integer")
 
         self._data["id"] = value
@@ -253,7 +252,7 @@ class MQTTRPC10Response(MQTTRPCBaseResponse):
 
     @_id.setter
     def _id(self, value):
-        if value is not None and not isinstance(value, six.string_types + six.integer_types):
+        if value is not None and not isinstance(value, (str, int)):
             raise ValueError("id should be string or integer")
 
         self._data["id"] = value
