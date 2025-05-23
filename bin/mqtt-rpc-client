@@ -5,10 +5,12 @@ import argparse
 import json
 import sys
 
-from jsonrpc.exceptions import JSONRPCError
 from wb_common.mqtt_client import DEFAULT_BROKER_URL, MQTTClient
 
-from mqttrpc.client import MQTTRPCError, TimeoutError, TMQTTRPCClient
+from mqttrpc.client import (  # pylint: disable=redefined-builtin
+    TimeoutError,
+    TMQTTRPCClient,
+)
 
 
 def main():
@@ -41,8 +43,8 @@ def main():
     except TimeoutError:
         print("Request timed out")
         sys.exit(124)
-    except Exception as e:
-        print("Error: %s" % e)
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Error: {e}")
         sys.exit(1)
     finally:
         mqtt_client.stop()

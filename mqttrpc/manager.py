@@ -17,7 +17,7 @@ from .protocol import MQTTRPC10Request, MQTTRPC10Response
 logger = logging.getLogger(__name__)
 
 
-class MQTTRPCResponseManager(object):
+class MQTTRPCResponseManager:
     """MQTT-RPC response manager.
 
     Method brings syntactic sugar into library. Given dispatcher it handles
@@ -38,11 +38,15 @@ class MQTTRPCResponseManager(object):
         try:
             json.loads(request_str)
         except (TypeError, ValueError):
-            return None, MQTTRPC10Response(error=JSONRPCParseError()._data)
+            return None, MQTTRPC10Response(
+                error=JSONRPCParseError()._data  # pylint: disable=protected-access
+            )
         try:
             request = MQTTRPC10Request.from_json(request_str)
         except JSONRPCInvalidRequestException:
-            return None, MQTTRPC10Response(error=JSONRPCInvalidRequest()._data)
+            return None, MQTTRPC10Response(
+                error=JSONRPCInvalidRequest()._data  # pylint: disable=protected-access
+            )
 
         return request, None
 
@@ -51,8 +55,7 @@ class MQTTRPCResponseManager(object):
         request, erroneous_response = cls._prepare_request(request_str)
         if request:
             return cls.handle_request(request, service_id, method_id, dispatcher)
-        else:
-            return erroneous_response
+        return erroneous_response
 
     @classmethod
     def _process_exception(cls, request, method, e):
@@ -63,15 +66,21 @@ class MQTTRPCResponseManager(object):
         }
 
         if isinstance(e, JSONRPCDispatchException):
-            return MQTTRPC10Response(_id=request._id, error=e.error._data)
-        elif isinstance(e, TypeError) and is_invalid_params(method, *request.args, **request.kwargs):
-            return MQTTRPC10Response(_id=request._id, error=JSONRPCInvalidParams(data=data)._data)
-        else:
-            logger.exception("API Exception: {0}".format(data))
-            return MQTTRPC10Response(_id=request._id, error=JSONRPCServerError(data=data)._data)
+            return MQTTRPC10Response(_id=request._id, error=e.error._data)  # pylint: disable=protected-access
+        if isinstance(e, TypeError) and is_invalid_params(method, *request.args, **request.kwargs):
+            return MQTTRPC10Response(
+                _id=request._id,  # pylint: disable=protected-access
+                error=JSONRPCInvalidParams(data=data)._data,  # pylint: disable=protected-access
+            )
+        logger.exception("API Exception: %s", data)
+        return MQTTRPC10Response(
+            _id=request._id, error=JSONRPCServerError(data=data)._data  # pylint: disable=protected-access
+        )
 
     @classmethod
-    def handle_request(cls, request, service_id, method_id, dispatcher):
+    def handle_request(  # pylint: disable=inconsistent-return-statements
+        cls, request, service_id, method_id, dispatcher
+    ):
         """Handle request data.
 
         At this moment request has correct jsonrpc format.
@@ -85,19 +94,20 @@ class MQTTRPCResponseManager(object):
         try:
             method = dispatcher[(service_id, method_id)]
         except KeyError:
-            output = MQTTRPC10Response(_id=request._id, error=JSONRPCMethodNotFound()._data)
+            output = MQTTRPC10Response(
+                _id=request._id, error=JSONRPCMethodNotFound()._data  # pylint: disable=protected-access
+            )
         else:
             try:
                 result = method(*request.args, **request.kwargs)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 output = cls._process_exception(request, method, e)
             else:
-                output = MQTTRPC10Response(_id=request._id, result=result)
+                output = MQTTRPC10Response(_id=request._id, result=result)  # pylint: disable=protected-access
         finally:
             if not request.is_notification:
-                return output
-            else:
-                return []
+                return output  # pylint: disable=return-in-finally, lost-exception
+            return []  # pylint: disable=return-in-finally, lost-exception
 
 
 class AMQTTRPCResponseManager(MQTTRPCResponseManager):
@@ -106,28 +116,32 @@ class AMQTTRPCResponseManager(MQTTRPCResponseManager):
     """
 
     @classmethod
-    async def handle(cls, request_str, service_id, method_id, dispatcher):
+    async def handle(
+        cls, request_str, service_id, method_id, dispatcher
+    ):  # pylint: disable=invalid-overridden-method
         request, erroneous_response = cls._prepare_request(request_str)
         if request:
             return await cls.handle_request(request, service_id, method_id, dispatcher)
-        else:
-            return erroneous_response
+        return erroneous_response
 
     @classmethod
-    async def handle_request(cls, request, service_id, method_id, dispatcher):
+    async def handle_request(
+        cls, request, service_id, method_id, dispatcher
+    ):  # pylint: disable=invalid-overridden-method
         try:
             method = dispatcher[(service_id, method_id)]
         except KeyError:
-            output = MQTTRPC10Response(_id=request._id, error=JSONRPCMethodNotFound()._data)
+            output = MQTTRPC10Response(
+                _id=request._id, error=JSONRPCMethodNotFound()._data  # pylint: disable=protected-access
+            )
         else:
             try:
                 result = await method(*request.args, **request.kwargs)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 output = cls._process_exception(request, method, e)
             else:
-                output = MQTTRPC10Response(_id=request._id, result=result)
+                output = MQTTRPC10Response(_id=request._id, result=result)  # pylint: disable=protected-access
         finally:
             if not request.is_notification:
-                return output
-            else:
-                return []
+                return output  # pylint: disable=return-in-finally, lost-exception
+            return []  # pylint: disable=return-in-finally, lost-exception
