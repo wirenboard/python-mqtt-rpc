@@ -5,7 +5,7 @@ from jsonrpc.utils import JSONSerializable
 class MQTTRPCBaseRequest(JSONSerializable):
     """Base class for JSON-RPC 1.0 and JSON-RPC 2.0 requests."""
 
-    def __init__(self, params=None, _id=None, is_notification=None):
+    def __init__(self, params=None, _id=None, is_notification=None):  # pylint: disable=super-init-not-called
         self.data = {}
         self.params = params
         self._id = _id
@@ -41,14 +41,14 @@ class MQTTRPCBaseRequest(JSONSerializable):
         return self.params if isinstance(self.params, dict) else {}
 
     @property
-    def json(self):
+    def json(self):  # pylint: disable=invalid-overridden-method
         return self.serialize(self.data)
 
 
 class MQTTRPCBaseResponse(JSONSerializable):
     """Base class for JSON-RPC 1.0 and JSON-RPC 2.0 responses."""
 
-    def __init__(self, result=None, error=None, _id=None):
+    def __init__(self, result=None, error=None, _id=None):  # pylint: disable=super-init-not-called
         self.data = {}
 
         self.result = result
@@ -70,7 +70,7 @@ class MQTTRPCBaseResponse(JSONSerializable):
         self._data = value
 
     @property
-    def json(self):
+    def json(self):  # pylint: disable=invalid-overridden-method
         return self.serialize(self.data)
 
 
