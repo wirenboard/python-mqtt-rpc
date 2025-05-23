@@ -1,5 +1,3 @@
-import json
-
 from jsonrpc.exceptions import JSONRPCError, JSONRPCInvalidRequestException
 from jsonrpc.utils import JSONSerializable
 
@@ -7,8 +5,8 @@ from jsonrpc.utils import JSONSerializable
 class MQTTRPCBaseRequest(JSONSerializable):
     """Base class for JSON-RPC 1.0 and JSON-RPC 2.0 requests."""
 
-    def __init__(self, params=None, _id=None, is_notification=None):
-        self.data = dict()
+    def __init__(self, params=None, _id=None, is_notification=None):  # pylint: disable=super-init-not-called
+        self.data = {}
         self.params = params
         self._id = _id
         self.is_notification = is_notification
@@ -43,15 +41,15 @@ class MQTTRPCBaseRequest(JSONSerializable):
         return self.params if isinstance(self.params, dict) else {}
 
     @property
-    def json(self):
+    def json(self):  # pylint: disable=invalid-overridden-method
         return self.serialize(self.data)
 
 
 class MQTTRPCBaseResponse(JSONSerializable):
     """Base class for JSON-RPC 1.0 and JSON-RPC 2.0 responses."""
 
-    def __init__(self, result=None, error=None, _id=None):
-        self.data = dict()
+    def __init__(self, result=None, error=None, _id=None):  # pylint: disable=super-init-not-called
+        self.data = {}
 
         self.result = result
         self.error = error
@@ -72,7 +70,7 @@ class MQTTRPCBaseResponse(JSONSerializable):
         self._data = value
 
     @property
-    def json(self):
+    def json(self):  # pylint: disable=invalid-overridden-method
         return self.serialize(self.data)
 
 
@@ -129,7 +127,7 @@ class MQTTRPC10Request(MQTTRPCBaseRequest):
     @params.setter
     def params(self, value):
         if value is not None and not isinstance(value, (list, tuple, dict)):
-            raise ValueError("Incorrect params {0}".format(value))
+            raise ValueError(f"Incorrect params {value}")
 
         value = list(value) if isinstance(value, tuple) else value
 
@@ -171,7 +169,7 @@ class MQTTRPC10Request(MQTTRPCBaseRequest):
                 is_notification="id" not in data,
             )
         except ValueError as e:
-            raise JSONRPCInvalidRequestException(str(e))
+            raise JSONRPCInvalidRequestException(str(e)) from e
 
         return result
 
@@ -274,6 +272,6 @@ class MQTTRPC10Response(MQTTRPCBaseResponse):
         try:
             result = MQTTRPC10Response(error=data.get("error"), result=data.get("result"), _id=data.get("id"))
         except ValueError as e:
-            raise JSONRPCInvalidRequestException(str(e))
+            raise JSONRPCInvalidRequestException(str(e)) from e
 
         return result

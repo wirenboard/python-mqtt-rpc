@@ -7,9 +7,6 @@ except ImportError:
     import paho.mqtt.client as mosquitto
 
 import logging
-import random
-import sys
-import time
 
 from mqttrpc import MQTTRPCResponseManager, dispatcher
 
@@ -21,17 +18,16 @@ def foobar(**kwargs):
     return kwargs["foo"] + kwargs["bar"]
 
 
-class TMQTTRPCServer(object):
-    def __init__(self, client, driver_id):
+class TMQTTRPCServer:
+    def __init__(self, client, driver_id):  # pylint: disable=redefined-outer-name
         self.client = client
         self.driver_id = driver_id
 
-    def on_mqtt_message(self, mosq, obj, msg):
+    def on_mqtt_message(self, mosq, obj, msg):  # pylint: disable=unused-argument
         print(msg.topic)
         print(msg.payload)
 
         parts = msg.topic.split("/")
-        driver_id = parts[3]
         service_id = parts[4]
         method_id = parts[5]
         client_id = parts[6]
@@ -39,14 +35,14 @@ class TMQTTRPCServer(object):
         response = MQTTRPCResponseManager.handle(msg.payload, service_id, method_id, dispatcher)
 
         self.client.publish(
-            "/rpc/v1/%s/%s/%s/%s/reply" % (self.driver_id, service_id, method_id, client_id), response.json
+            f"/rpc/v1/{self.driver_id}/{service_id}/{method_id}/{client_id}/reply", response.json
         )
 
     def setup(self):
-        for service, method in dispatcher.iterkeys():
-            self.client.publish("/rpc/v1/%s/%s/%s" % (self.driver_id, service, method), "1", retain=True)
+        for service, method in dispatcher.items():
+            self.client.publish(f"/rpc/v1/{self.driver_id}/{service}/{method}", "1", retain=True)
 
-            self.client.subscribe("/rpc/v1/%s/%s/%s/+" % (self.driver_id, service, method))
+            self.client.subscribe(f"/rpc/v1/{self.driver_id}/{service}/{method}/+")
 
 
 # Dispatcher is dictionary {<method_name>: callable}

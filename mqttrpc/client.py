@@ -2,7 +2,6 @@ import json
 import threading
 
 import paho.mqtt.client as mqtt
-from jsonrpc.exceptions import JSONRPCError
 
 # ~ from concurrent.futures import Future
 from .protocol import MQTTRPC10Response
@@ -10,7 +9,7 @@ from .protocol import MQTTRPC10Response
 # ~ from concurrent.futures._base import TimeoutError
 
 
-class TimeoutError(Exception):
+class TimeoutError(Exception):  # pylint: disable=redefined-builtin
     pass
 
 
@@ -18,13 +17,13 @@ class MQTTRPCError(Exception):
     """Represents error raised by server"""
 
     def __init__(self, message, code, data):
-        super(MQTTRPCError, self).__init__("%s [%d]: %s" % (message, code, data))
+        super().__init__(f"{message} [{code}]: {data}")
         self.rpc_message = message
         self.code = code
         self.data = data
 
 
-class AsyncResult(object):
+class AsyncResult:
     def __init__(self):
         self._event = threading.Event()
         self._result = None
@@ -41,48 +40,48 @@ class AsyncResult(object):
     def _get_result(self):
         if self._exception:
             raise self._exception
-        else:
-            return self._result
+        return self._result
 
     def result(self, timeout=None):
         if self._event.wait(timeout):
             return self._get_result()
-        else:
-            raise TimeoutError()
+        raise TimeoutError()
 
     def exception(self, timeout=None):
         if self._event.wait(timeout):
             return self._exception
-        else:
-            raise TimeoutError()
+        raise TimeoutError()
 
 
-class TMQTTRPCClient(object):
+class TMQTTRPCClient:
     def __init__(self, client):
         self.client = client
         self.counter = 0
         self.futures = {}
         self.subscribes = set()
-        if type(self.client._client_id) is bytes:
+        if isinstance(self.client._client_id, bytes):
             self.rpc_client_id = self.client._client_id.decode().replace("/", "_")
         else:
             self.rpc_client_id = str(self.client._client_id).replace("/", "_")
 
-    def on_mqtt_message(self, mosq, obj, msg):
+    def on_mqtt_message(  # pylint: disable=unused-argument, inconsistent-return-statements
+        self, mosq, obj, msg
+    ):
         """return True if the message was indeed an rpc call"""
 
-        if not mqtt.topic_matches_sub("/rpc/v1/+/+/+/%s/reply" % self.rpc_client_id, msg.topic):
+        if not mqtt.topic_matches_sub(f"/rpc/v1/+/+/+/{self.rpc_client_id}/reply", msg.topic):
             return
 
         parts = msg.topic.split("/")
         driver_id = parts[3]
         service_id = parts[4]
         method_id = parts[5]
-        client_id = parts[6]
 
         result = MQTTRPC10Response.from_json(msg.payload.decode("utf8"))
 
-        future = self.futures.pop((driver_id, service_id, method_id, result._id), None)
+        future = self.futures.pop(
+            (driver_id, service_id, method_id, result._id), None  # pylint: disable=protected-access
+        )
         if future is None:
             return True
 
@@ -99,7 +98,7 @@ class TMQTTRPCClient(object):
 
         return True
 
-    def call(self, driver, service, method, params, timeout=None):
+    def call(self, driver, service, method, params, timeout=None):  # pylint: disable=too-many-arguments
         future = self.call_async(driver, service, method, params)
 
         try:
@@ -108,23 +107,24 @@ class TMQTTRPCClient(object):
             # delete callback
             self.futures.pop((driver, service, method, future.packet_id), None)
             raise err
-        else:
-            return result
+        return result
 
-    def call_async(self, driver, service, method, params, result_future=AsyncResult):
+    def call_async(
+        self, driver, service, method, params, result_future=AsyncResult
+    ):  # pylint: disable=too-many-arguments
         self.counter += 1
         payload = {"params": params, "id": self.counter}
 
         result = result_future()
-        result.packet_id = self.counter
+        result.packet_id = self.counter  # pylint: disable=attribute-defined-outside-init
         self.futures[(driver, service, method, self.counter)] = result
 
-        topic = "/rpc/v1/%s/%s/%s/%s" % (driver, service, method, self.rpc_client_id)
+        topic = f"/rpc/v1/{driver}/{service}/{method}/{self.rpc_client_id}"
 
         subscribe_key = (driver, service, method)
         if subscribe_key not in self.subscribes:
             self.subscribes.add(subscribe_key)
-            self.client.subscribe(topic + "/reply")
+            self.client.subscribe(f"{topic}/reply")
 
         self.client.publish(topic, json.dumps(payload))
 

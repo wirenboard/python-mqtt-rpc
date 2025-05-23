@@ -11,7 +11,8 @@ def get_version():
 
 def read(fname):
     try:
-        return open(os.path.join(os.path.dirname(__file__), fname)).read()
+        path = os.path.join(os.path.dirname(__file__), fname)
+        return open(path, encoding="utf-8").read()
     except IOError:
         return ""
 

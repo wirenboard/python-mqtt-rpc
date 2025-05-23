@@ -1,4 +1,4 @@
-""" Dispatcher is used to add methods (functions) to the server.
+"""Dispatcher is used to add methods (functions) to the server.
 
 For usage examples see :meth:`Dispatcher.add_method`
 
@@ -27,7 +27,7 @@ class Dispatcher(MutableMapping):
         None
 
         """
-        self.method_map = dict()
+        self.method_map = {}
 
         if prototype is not None:
             self.build_method_map(prototype)
@@ -36,7 +36,7 @@ class Dispatcher(MutableMapping):
         return self.method_map[key]
 
     def __setitem__(self, key, value):
-        if isinstance(key, tuple) or isinstance(key, list):
+        if isinstance(key, (list, tuple)):
             if len(key) == 2:
                 self.method_map[key] = value
                 return
@@ -61,8 +61,8 @@ class Dispatcher(MutableMapping):
     def add_object(self, obj):
         self.build_method_map(obj)
 
-    def add_dict(self, dict):
-        self.build_method_map(dict)
+    def add_dict(self, dictionary):
+        self.build_method_map(dictionary)
 
     def add_method(self, f, service=None, name=None):
         """Add a method to the dispatcher.
