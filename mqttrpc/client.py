@@ -2,6 +2,7 @@ import json
 import threading
 
 import paho.mqtt.client as mqtt
+from jsonrpc.exceptions import JSONRPCException
 
 # ~ from concurrent.futures import Future
 from .protocol import MQTTRPC10Response
@@ -77,7 +78,22 @@ class TMQTTRPCClient:
         service_id = parts[4]
         method_id = parts[5]
 
-        result = MQTTRPC10Response.from_json(msg.payload.decode("utf8"))
+        json_str = msg.payload.decode("utf8")
+
+        try:
+            result = MQTTRPC10Response.from_json(json_str)
+        except JSONRPCException as err:
+            try:
+                data = json.loads(json_str)
+            except Exception:  # pylint: disable=broad-except
+                data = None
+            if isinstance(data, dict) and data.get("id") is not None:
+                future = self.futures.pop(
+                    (driver_id, service_id, method_id, data["id"]), None  # pylint: disable=protected-access
+                )
+                if future is not None:
+                    future.set_exception(err)
+            return True
 
         future = self.futures.pop(
             (driver_id, service_id, method_id, result._id), None  # pylint: disable=protected-access
@@ -95,7 +111,6 @@ class TMQTTRPCClient:
             )
 
         future.set_result(result.result)
-
         return True
 
     def call(self, driver, service, method, params, timeout=None):  # pylint: disable=too-many-arguments
