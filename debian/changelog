@@ -1,3 +1,9 @@
+python-mqttrpc (1.3.3) stable; urgency=medium
+
+  * Handle wrong response structures more gracefully
+
+ -- Petr Krasnoshchekov <petr.krasnoshchekov@wirenboard.com>  Fri, 14 Nov 2025 20:53:47 +0500
+
 python-mqttrpc (1.3.2) stable; urgency=medium
 
   * Enable angry pylint. No functional changes 
