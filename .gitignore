@@ -1,4 +1,5 @@
 ### Python ###
+build/
 *.egg-info/
 .venv
 
