@@ -113,7 +113,9 @@ class TMQTTRPCClient:
         future.set_result(result.result)
         return True
 
-    def call(self, driver, service, method, params, timeout=None):  # pylint: disable=too-many-arguments
+    def call(
+        self, driver, service, method, params, timeout=None
+    ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
         future = self.call_async(driver, service, method, params)
 
         try:
@@ -126,7 +128,7 @@ class TMQTTRPCClient:
 
     def call_async(
         self, driver, service, method, params, result_future=AsyncResult
-    ):  # pylint: disable=too-many-arguments
+    ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self.counter += 1
         payload = {"params": params, "id": self.counter}
 
