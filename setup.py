@@ -49,7 +49,7 @@ setup(
     license="MIT",
     install_requires=[
         "json-rpc==1.13.0",
-        "paho-mqtt==1.5.1",
+        "paho-mqtt==2.1.0",
         "wb-common @ git+https://github.com/wirenboard/wb-common.git@master",
     ],
 )
