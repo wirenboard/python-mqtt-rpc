@@ -23,7 +23,7 @@ setup(
     packages=find_packages(),
     # metadata for upload to PyPI
     author="Evgeny Boger",
-    author_email="boger@contactless.ru",
+    author_email="boger@wirenboard.com",
     maintainer="Wiren Board Team",
     maintainer_email="info@wirenboard.com",
     url="https://github.com/wirenboard/python-mqtt-rpc",
