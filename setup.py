@@ -23,7 +23,7 @@ setup(
     packages=find_packages(),
     # metadata for upload to PyPI
     author="Evgeny Boger",
-    author_email="boger@contactless.ru",
+    author_email="boger@wirenboard.com",
     maintainer="Wiren Board Team",
     maintainer_email="info@wirenboard.com",
     url="https://github.com/wirenboard/python-mqtt-rpc",
@@ -49,7 +49,7 @@ setup(
     license="MIT",
     install_requires=[
         "json-rpc==1.13.0",
-        "paho-mqtt==1.5.1",
+        "paho-mqtt==2.1.0",
         "wb-common @ git+https://github.com/wirenboard/wb-common.git@master",
     ],
 )
