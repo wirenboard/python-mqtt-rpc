@@ -13,7 +13,7 @@ from mqttrpc.client import (  # pylint: disable=redefined-builtin
 )
 
 
-def main():
+def get_parser():
     parser = argparse.ArgumentParser(
         description="Sample RPC client", add_help=True, formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -30,6 +30,11 @@ def main():
     parser.add_argument("-m", "--method", dest="method", type=str, help="Method name", required=True)
     parser.add_argument("-a", "--args", dest="args", type=json.loads, help="Method arguments", default={})
     parser.add_argument("-t", "--timeout", dest="timeout", type=int, help="Timeout in seconds", default=10)
+    return parser
+
+
+def main():
+    parser = get_parser()
     args = parser.parse_args()
 
     try:
