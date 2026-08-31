@@ -119,7 +119,7 @@ class TMQTTRPCClient:
         future = self.call_async(driver, service, method, params)
 
         try:
-            result = future.result(1e100 if timeout is None else timeout)
+            result = future.result(timeout)
         except TimeoutError as err:
             # delete callback
             self.futures.pop((driver, service, method, future.packet_id), None)
