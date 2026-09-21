@@ -1,3 +1,9 @@
+python-mqttrpc (1.3.11) stable; urgency=medium
+
+  * Add fish/zsh completions
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Thu, 17 Sep 2026 19:00:00 +0400
+
 python-mqttrpc (1.3.10) stable; urgency=medium
 
   * Fix call() with no timeout raising OverflowError instead of waiting

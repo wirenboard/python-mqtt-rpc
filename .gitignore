@@ -1,6 +1,7 @@
 ### Python ###
 build/
 *.egg-info/
+__pycache__
 .venv
 
 ### direnv ###

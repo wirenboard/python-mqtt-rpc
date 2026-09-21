@@ -52,4 +52,5 @@ setup(
         "paho-mqtt==2.1.0",
         "wb-common @ git+https://github.com/wirenboard/wb-common.git@master",
     ],
+    scripts=["bin/mqtt-rpc-client"],
 )
