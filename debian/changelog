@@ -1,3 +1,9 @@
+python-mqttrpc (1.3.11) stable; urgency=medium
+
+  * mqtt-rpc-client: allow reading method arguments from stdin
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Tue, 22 Sep 2026 12:53:39 +0400
+
 python-mqttrpc (1.3.10) stable; urgency=medium
 
   * Fix call() with no timeout raising OverflowError instead of waiting
