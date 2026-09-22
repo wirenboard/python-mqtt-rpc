@@ -1,2 +1,3 @@
-bin/mqtt-rpc-client /usr/bin
-completions/*.bash /usr/share/bash-completion/completions
+completions/*.bash usr/share/bash-completion/completions
+completions/*.fish usr/share/fish/completions
+completions/_* usr/share/zsh/vendor-completions
