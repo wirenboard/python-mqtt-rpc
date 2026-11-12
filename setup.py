@@ -46,7 +46,7 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    license="MIT",
+    license="MIT-WB",
     install_requires=[
         "json-rpc==1.13.0",
         "paho-mqtt==2.1.0",
